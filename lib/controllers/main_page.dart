@@ -24,6 +24,19 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Color.fromARGB(0, 32, 12, 12),
+        title: Container(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Image.network('https://maisondesmandataires.com/wp-content/uploads/2022/05/3G-LOGO-HORI.png', width: 200, height: 100),
+              Icon( Icons.notifications_none, color: Colors.black,size: 35,),
+            ],
+          ),
+        ),
+        elevation: 0,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         elevation: 7,
         currentIndex: _selectedIndex,

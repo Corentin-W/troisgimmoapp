@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "996279206856",
+    "project_id": "g-immapp-3596a",
+    "storage_bucket": "g-immapp-3596a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:996279206856:android:4a9982151721ee68abf6fd",
+        "android_client_info": {
+          "package_name": "com.example.troisgimmoapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "996279206856-oa72riouh5i85d1n0t2lclkdlmrcjm5m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCUOt_3CQRyUzBaZ2ocdviP2n9gmL96a6U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "996279206856-oa72riouh5i85d1n0t2lclkdlmrcjm5m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class Annonce {
   int prix;
@@ -17,6 +19,20 @@ class Annonce {
       required this.linkPhoto,
       required this.villeDiffusion});
 
+  static getAllAnnonces() {
+    final db = FirebaseFirestore.instance;
+    db.collection('Annonces').get().then(
+      (querySnapshot) {
+        print("Success");
+        for (var docSnapshot in querySnapshot.docs) {
+          print('${docSnapshot.id} => ${docSnapshot.data()}');
+        }
+      },
+      onError: (e) => print('probleme mamen'),
+    );
+  }
+
+  
   Widget cardAnnonce(
       {required String image,
       required String type,
@@ -73,7 +89,7 @@ class Annonce {
                   ],
                 ),
                 Padding(
-                    padding:const EdgeInsets.only(top: 5),
+                    padding: const EdgeInsets.only(top: 5),
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
                       children: [

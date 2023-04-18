@@ -97,8 +97,8 @@ class _AgentProfilState extends State<AgentProfil> {
       children: [
         headerRow(
             urlPhoto: agent.photoProfil, prenom: agent.prenom, nom: agent.nom),
-        infosRow(email: agent.email, telephone: agent.telephone)
-      ],
+        // infosRow(email: agent.email, telephone: agent.telephone)
+      ]
     );
   }
 
@@ -118,6 +118,7 @@ class _AgentProfilState extends State<AgentProfil> {
             floating: false,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
+                color: Theme.of(context).colorScheme.background,
                 padding: const EdgeInsets.all(22),
                 child: allHeader(
                     email: email,
@@ -146,15 +147,15 @@ class _AgentProfilState extends State<AgentProfil> {
                             pathToImageFromProfil: images[index],
                             nomberOfLikes: 4,
                             index: index,
+                            publishDate: 'Il y a 2h',
                           );
                         }));
                       },
                       child: Container(
                         height: 50,
                         width: 30,
-                        child: Hero(
-                            tag: index, child: Image.network(images[index])),
-                      ));
+                        child: Image.network(images[index])),
+                      );
                 },
                 childCount: images.length,
               ),
@@ -192,41 +193,41 @@ class _AgentProfilState extends State<AgentProfil> {
     );
   }
 
-  Row headerRow(
+  Container headerRow(
       {required String urlPhoto, required String prenom, required String nom}) {
-    return Row(
-      children: [
-        CircleAvatar(
-          backgroundImage: NetworkImage(urlPhoto),
-          radius: 70,
-        ),
-        const Spacer(),
-        Column(
-          children: [
-            Text(
-              prenom,
-              style: GoogleFonts.poppins(
-                  textStyle: const TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w800,
-                      fontStyle: FontStyle.italic)),
-            ),
-            Text(
-              nom,
-              style: GoogleFonts.poppins(
-                  textStyle: const TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w800,
-                      fontStyle: FontStyle.italic)),
-            ),
-            Image.network(
-              'https://maisondesmandataires.com/wp-content/uploads/2022/05/3G-LOGO-HORI.png',
-              height: 50,
-              width: 150,
-            )
-          ],
-        )
-      ],
+    return Container(
+      color: Theme.of(context).colorScheme.background,
+      width: MediaQuery. of(context). size. width,
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          CircleAvatar(
+            backgroundImage: NetworkImage(urlPhoto),
+            radius: 40,
+          ),
+          const Spacer(),
+          Column(
+            children: [
+              Text(
+                prenom,
+                style: GoogleFonts.poppins(
+                    textStyle: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        fontStyle: FontStyle.italic)),
+              ),
+              Text(
+                nom,
+                style: GoogleFonts.poppins(
+                    textStyle: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        fontStyle: FontStyle.italic)),
+              ),
+            ],
+          )
+        ],
+      )
     );
   }
 }
