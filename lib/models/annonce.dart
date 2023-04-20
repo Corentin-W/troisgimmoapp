@@ -19,18 +19,18 @@ class Annonce {
       required this.linkPhoto,
       required this.villeDiffusion});
 
-  static getAllAnnonces() {
-    final db = FirebaseFirestore.instance;
-    db.collection('Annonces').get().then(
-      (querySnapshot) {
-        print("Success");
-        for (var docSnapshot in querySnapshot.docs) {
-          print('${docSnapshot.id} => ${docSnapshot.data()}');
-        }
-      },
-      onError: (e) => print('probleme mamen'),
-    );
-  }
+  // static getAllAnnonces() {
+  //   final db = FirebaseFirestore.instance;
+  //   db.collection('Annonces').get().then(
+  //     (querySnapshot) {
+  //       print("Success");
+  //       for (var docSnapshot in querySnapshot.docs) {
+  //         print('${docSnapshot.id} => ${docSnapshot.data()}');
+  //       }
+  //     },
+  //     onError: (e) => print('probleme mamen'),
+  //   );
+  // }
 
   
   Widget cardAnnonce(
@@ -43,7 +43,7 @@ class Annonce {
     return Card(
       margin: const EdgeInsets.only(top: 30, left: 10, right: 10),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20.0), //<-- SEE HERE
+        borderRadius: BorderRadius.circular(20.0),
       ),
       elevation: 4,
       child: Column(children: [

@@ -10,99 +10,33 @@ class Annonces extends StatefulWidget {
 }
 
 class _AnnoncesState extends State<Annonces> {
-  // List<Annonce> allAnnonces = [
-  //   Annonce(
-  //       prix: 100000,
-  //       surface: 28,
-  //       honoraires: 1500,
-  //       type: 'Appartement',
-  //       linkPhoto:
-  //           'https://v.seloger.com/s/cdn/x/visuels/0/t/2/7/0t27el8ypp2bcq0lgtajk235gx0w8etr012que8ao.jpg',
-  //       villeDiffusion: 'Annecy'),
-  //   Annonce(
-  //       prix: 300000,
-  //       surface: 88,
-  //       honoraires: 1500,
-  //       type: 'Maison',
-  //       linkPhoto:
-  //           'https://v.seloger.com/s/cdn/x/visuels/0/t/2/7/0t27el8ypp2bcq0lgtajk235gx0w8etr012que8ao.jpg',
-  //       villeDiffusion: 'Toulouse'),
-  //   Annonce(
-  //       prix: 1505000,
-  //       surface: 228,
-  //       honoraires: 11500,
-  //       type: 'Villa',
-  //       linkPhoto:
-  //           'https://v.seloger.com/s/cdn/x/visuels/0/t/2/7/0t27el8ypp2bcq0lgtajk235gx0w8etr012que8ao.jpg',
-  //       villeDiffusion: 'Saint-Jorioz'),
-  //   Annonce(
-  //       prix: 9860000,
-  //       surface: 128,
-  //       honoraires: 8500,
-  //       type: 'Maison / Villa',
-  //       linkPhoto:
-  //           'https://v.seloger.com/s/cdn/x/visuels/0/t/2/7/0t27el8ypp2bcq0lgtajk235gx0w8etr012que8ao.jpg',
-  //       villeDiffusion: 'Bordeaux'),
-  //   Annonce(
-  //       prix: 830750,
-  //       surface: 78,
-  //       honoraires: 10500,
-  //       type: 'Maison',
-  //       linkPhoto:
-  //           'https://v.seloger.com/s/cdn/x/visuels/0/t/2/7/0t27el8ypp2bcq0lgtajk235gx0w8etr012que8ao.jpg',
-  //       villeDiffusion: 'Rennes'),
-  //   Annonce(
-  //       prix: 100000,
-  //       surface: 28,
-  //       honoraires: 1500,
-  //       type: 'Appartement',
-  //       linkPhoto:
-  //           'https://v.seloger.com/s/cdn/x/visuels/0/t/2/7/0t27el8ypp2bcq0lgtajk235gx0w8etr012que8ao.jpg',
-  //       villeDiffusion: 'Annecy'),
-  //   Annonce(
-  //       prix: 300000,
-  //       surface: 88,
-  //       honoraires: 1500,
-  //       type: 'Maison',
-  //       linkPhoto:
-  //           'https://v.seloger.com/s/cdn/x/visuels/0/t/2/7/0t27el8ypp2bcq0lgtajk235gx0w8etr012que8ao.jpg',
-  //       villeDiffusion: 'Toulouse'),
-  //   Annonce(
-  //       prix: 1505000,
-  //       surface: 228,
-  //       honoraires: 11500,
-  //       type: 'Villa',
-  //       linkPhoto:
-  //           'https://v.seloger.com/s/cdn/x/visuels/0/t/2/7/0t27el8ypp2bcq0lgtajk235gx0w8etr012que8ao.jpg',
-  //       villeDiffusion: 'Saint-Jorioz'),
-  //   Annonce(
-  //       prix: 9860000,
-  //       surface: 128,
-  //       honoraires: 8500,
-  //       type: 'Maison / Villa',
-  //       linkPhoto:
-  //           'https://v.seloger.com/s/cdn/x/visuels/0/t/2/7/0t27el8ypp2bcq0lgtajk235gx0w8etr012que8ao.jpg',
-  //       villeDiffusion: 'Bordeaux'),
-  //   Annonce(
-  //       prix: 830750,
-  //       surface: 78,
-  //       honoraires: 10500,
-  //       type: 'Maison',
-  //       linkPhoto:
-  //           'https://v.seloger.com/s/cdn/x/visuels/0/t/2/7/0t27el8ypp2bcq0lgtajk235gx0w8etr012que8ao.jpg',
-  //       villeDiffusion: 'Rennes'),
-  // ];
+  final db = FirebaseFirestore.instance;
+  List<Annonce>? listeDesAnnonces = [];
 
   @override
   Widget build(BuildContext context) {
-    return listeLesAnnonces();
-  }
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance.collection('Annonces').snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.hasError) {
+          return Text('Something went wrong');
+        }
 
-  Future listeLesAnnonces() async {
-    Future<List<dynamic>?> allAnnonces = await getAllAnnonces();
-    print(allAnnonces);
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Text("Loading");
+        }
 
-    return Text('hellomoto');
+        return ListView(
+          children: snapshot.data!.docs.map((DocumentSnapshot document) {
+            Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+            return ListTile(
+              title: Text(data['villeDiffusion']),
+              subtitle: Text(data['surface'].toString()),
+            );
+          }).toList(),
+        );
+      },
+    );
   }
 
   getAllAnnonces() async {
@@ -120,6 +54,7 @@ class _AnnoncesState extends State<Annonces> {
               type: docSnapshot.get('type').toString(),
               linkPhoto: docSnapshot.get('linkPhoto').toString(),
               villeDiffusion: docSnapshot.get('villeDiffusion').toString());
+          print(annonce);
           listeDesAnnonces.add(annonce);
         }
         return listeDesAnnonces;
