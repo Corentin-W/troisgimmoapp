@@ -10,13 +10,14 @@ class Annonces extends StatefulWidget {
 }
 
 class _AnnoncesState extends State<Annonces> {
-  final db = FirebaseFirestore.instance;
+  final Stream<QuerySnapshot> db =
+      FirebaseFirestore.instance.collection('Annonces').snapshots();
   List<Annonce>? listeDesAnnonces = [];
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('Annonces').snapshots(),
+      stream: db,
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
           return Text('Something went wrong');
@@ -26,18 +27,38 @@ class _AnnoncesState extends State<Annonces> {
           return Text("Loading");
         }
 
-        return ListView(
-          children: snapshot.data!.docs.map((DocumentSnapshot document) {
-            Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-            return ListTile(
-              title: Text(data['villeDiffusion']),
-              subtitle: Text(data['surface'].toString()),
-            );
-          }).toList(),
+        return ListView.builder(
+          itemCount: snapshot.data!.docs.length,
+          itemBuilder: (context, index) {
+            final doc = snapshot.data!.docs[index];
+            return Annonce(
+                    prix: doc['prix'],
+                    surface: double.parse(doc['surface'].toString()),
+                    honoraires: double.parse(doc['honoraires'].toString()),
+                    type: doc['type'],
+                    linkPhoto: doc['linkPhoto'],
+                    villeDiffusion: doc['villeDiffusion'])
+                .cardAnnonce(
+                    image: doc['linkPhoto'],
+                    type: doc['type'],
+                    villeDiffusion: doc['type'],
+                    prix: doc['prix'],
+                    surface: double.parse(doc['surface'].toString()),
+                    honoraires: double.parse(doc['honoraires'].toString()));
+          },
         );
       },
     );
   }
+
+  // ListView(
+  //         children: snapshot.data!.docs.map((DocumentSnapshot document) {
+  //           Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+  //           return ListTile(
+  //             title: Text(data['villeDiffusion']),
+  //             subtitle: Text(data['surface'].toString()),
+  //           );
+  //         }).toList(),
 
   getAllAnnonces() async {
     final db = FirebaseFirestore.instance;

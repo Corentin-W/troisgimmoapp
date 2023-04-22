@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:troisgimmoapp/controllers/login_page.dart';
+import 'package:troisgimmoapp/controllers/welcome.dart';
 import 'controllers/main_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -34,6 +36,6 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-    return const MainPage();
+    return const Welcome();
   }
 }
