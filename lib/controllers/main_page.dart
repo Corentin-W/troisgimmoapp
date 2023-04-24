@@ -1,10 +1,9 @@
 import 'dart:io';
-import 'dart:async';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:flutter/material.dart';
 import 'package:troisgimmoapp/controllers/agent_profil.dart';
 import 'package:troisgimmoapp/controllers/annonces.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -16,6 +15,8 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   final scrollController = ScrollController();
   int _selectedIndex = 0;
+  String imageUrl = "";
+
   static const List _pages = [
     Annonces(),
     Icon(
@@ -24,41 +25,6 @@ class _MainPageState extends State<MainPage> {
     ),
     AgentProfil(),
   ];
-  late File _imageFile;
-  late File _croppedFile;
-
-  Future<void> _pickImage(ImageSource source) async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: source);
-
-    setState(() {
-      if (pickedFile != null) {
-        _imageFile = File(pickedFile.path);
-      } else {
-        print('No image selected.');
-      }
-    });
-  }
-
-  Future<void> _cropImage() async {
-    final ImageCropper imageCropper = ImageCropper();
-    final croppedFile = await imageCropper.cropImage(
-      sourcePath: _imageFile.path,
-      aspectRatioPresets: [
-        CropAspectRatioPreset.square,
-        CropAspectRatioPreset.ratio3x2,
-        CropAspectRatioPreset.original,
-        CropAspectRatioPreset.ratio4x3,
-        CropAspectRatioPreset.ratio16x9
-      ],
-    );
-
-    setState(() {
-      if (croppedFile != null) {
-        _croppedFile = croppedFile as File;
-      }
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +40,35 @@ class _MainPageState extends State<MainPage> {
                   width: 200,
                   height: 100),
               IconButton(
-                  onPressed: () => _pickImage(ImageSource.gallery),
+                  onPressed: () async {
+                    /** PICK IMAGE FROM GALLERY */
+                    ImagePicker imagePicker = ImagePicker();
+                    XFile? file = await imagePicker.pickImage(
+                        source: ImageSource.gallery);
+                    if (file == null) return;
+
+                    // Random name for database
+                    String uniqueFileName =
+                        DateTime.now().microsecondsSinceEpoch.toString();
+                    /** UPLOAD TO FIREBASE */
+                    // Get a rederence to storage
+                    Reference referenceRoot =
+                        FirebaseStorage.instance.ref('feed/01/');
+                    Reference referenceDirImages =
+                        referenceRoot.child('images');
+                    // Create a reference for the image to be stored
+                    Reference referenceImageToUpload =
+                        referenceDirImages.child(uniqueFileName);
+
+                    // Handle errors success
+                    try {
+                      //Store the file
+                      await referenceImageToUpload.putFile(File(file.path));
+
+                      //Success get the download url
+                      imageUrl = await referenceImageToUpload.getDownloadURL();
+                    } catch (e) {}
+                  },
                   icon: Icon(
                     Icons.add_a_photo_outlined,
                     color: Colors.black,

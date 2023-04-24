@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:troisgimmoapp/controllers/login_page.dart';
 import 'package:troisgimmoapp/controllers/welcome.dart';
-import 'controllers/main_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 Future<void> main() async {
