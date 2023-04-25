@@ -1,9 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:troisgimmoapp/controllers/picture_page.dart';
 import 'package:troisgimmoapp/models/agent.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:troisgimmoapp/models/post.dart';
-import 'package:image_picker/image_picker.dart';
 
 class AgentProfil extends StatefulWidget {
   const AgentProfil({super.key});
@@ -13,7 +12,6 @@ class AgentProfil extends StatefulWidget {
 }
 
 class _AgentProfilState extends State<AgentProfil> {
-  
   Agent agent = Agent(
       prenom: 'Patrick',
       nom: 'Patulacci',
@@ -24,39 +22,58 @@ class _AgentProfilState extends State<AgentProfil> {
 
   @override
   Widget build(BuildContext context) {
-    
-    return CustomScrollView(
-      slivers: <Widget>[
-        SliverToBoxAdapter(
-          child: headerRow(
-              urlPhoto: agent.photoProfil,
-              prenom: agent.prenom,
-              nom: agent.nom),
-        ),
-        SliverToBoxAdapter(
-          child: infosRow(email: agent.email, telephone: agent.telephone),
-        ),
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (BuildContext context, int index) {
-              return SingleChildScrollView(
-                child: Expanded(
-                  child: Column(
-                    children: [
-                      Image.network(
-                          'https://casoar.org/wp-content/uploads/2020/10/Bob-leponge.png'),
-                      Image.network(
-                          'https://casoar.org/wp-content/uploads/2020/10/Bob-leponge.png')
-                    ],
-                  ),
+    return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child: Padding(
+        padding: EdgeInsets.all(10),
+        child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              headerRow(
+                  urlPhoto: agent.photoProfil,
+                  prenom: agent.prenom,
+                  nom: agent.nom),
+              SizedBox(
+                height: 600,
+                child: FutureBuilder<List>(
+                  future: getPicturesFromStorage(),
+                  builder:
+                      (BuildContext context, AsyncSnapshot<List> snapshot) {
+                    print(snapshot);
+                    if (snapshot.hasData) {
+                      return ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        children: snapshot.data!
+                            .map((url) => Image.network(url.toString()))
+                            .toList(),
+                      );
+                    } else {
+                      return const CircularProgressIndicator();
+                    }
+                  },
                 ),
-              );
-            },
-            childCount: 5,
-          ),
-        ),
-      ],
+              ),
+            ]),
+      ),
     );
+  }
+
+  Future<List> getPicturesFromStorage() async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final User? user = auth.currentUser;
+    final String userID = user!.uid;
+    List urlList = [];
+    final ListResult result =
+        await FirebaseStorage.instance.ref('feed/$userID/images/').listAll();
+    for (final ref in result.items) {
+      final url = await ref.getDownloadURL();
+      urlList.add(url.toString());
+    }
+    print(urlList);
+
+    return urlList;
   }
 
   Column infosRow({required String email, required int telephone}) {
@@ -80,8 +97,6 @@ class _AgentProfilState extends State<AgentProfil> {
       ],
     );
   }
-
-
 
   Container headerRow(
       {required String urlPhoto, required String prenom, required String nom}) {

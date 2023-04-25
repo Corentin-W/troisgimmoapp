@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:troisgimmoapp/controllers/agent_profil.dart';
 import 'package:troisgimmoapp/controllers/annonces.dart';
@@ -41,6 +42,11 @@ class _MainPageState extends State<MainPage> {
                   height: 100),
               IconButton(
                   onPressed: () async {
+                    // Get the current user id
+                    final FirebaseAuth auth = FirebaseAuth.instance;
+                    final User? user = auth.currentUser;
+                    final String userID = user!.uid;
+
                     /** PICK IMAGE FROM GALLERY */
                     ImagePicker imagePicker = ImagePicker();
                     XFile? file = await imagePicker.pickImage(
@@ -51,9 +57,9 @@ class _MainPageState extends State<MainPage> {
                     String uniqueFileName =
                         DateTime.now().microsecondsSinceEpoch.toString();
                     /** UPLOAD TO FIREBASE */
-                    // Get a rederence to storage
+                    // Get a reference to storage
                     Reference referenceRoot =
-                        FirebaseStorage.instance.ref('feed/01/');
+                        FirebaseStorage.instance.ref('feed/$userID/');
                     Reference referenceDirImages =
                         referenceRoot.child('images');
                     // Create a reference for the image to be stored
@@ -67,9 +73,11 @@ class _MainPageState extends State<MainPage> {
 
                       //Success get the download url
                       imageUrl = await referenceImageToUpload.getDownloadURL();
-                    } catch (e) {}
+                    } catch (e) {
+                      print(e);
+                    }
                   },
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.add_a_photo_outlined,
                     color: Colors.black,
                     size: 35,
