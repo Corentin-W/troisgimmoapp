@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:troisgimmoapp/controllers/picture_page.dart';
 import 'package:troisgimmoapp/models/agent.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 
 class AgentProfil extends StatefulWidget {
   const AgentProfil({super.key});
@@ -19,45 +21,88 @@ class _AgentProfilState extends State<AgentProfil> {
       telephone: 0612345678,
       secteur: 'Corse',
       photoProfil: 'https://pbs.twimg.com/media/FjU2lkcWYAgNG6d.jpg');
-
+  // Controller _controllerFeed;
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.vertical,
-      child: Padding(
-        padding: EdgeInsets.all(10),
-        child: Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              headerRow(
-                  urlPhoto: agent.photoProfil,
-                  prenom: agent.prenom,
-                  nom: agent.nom),
-              SizedBox(
-                height: 600,
-                child: FutureBuilder<List>(
-                  future: getPicturesFromStorage(),
-                  builder:
-                      (BuildContext context, AsyncSnapshot<List> snapshot) {
-                    print(snapshot);
-                    if (snapshot.hasData) {
-                      return ListView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        children: snapshot.data!
-                            .map((url) => Image.network(url.toString()))
-                            .toList(),
-                      );
-                    } else {
-                      return const CircularProgressIndicator();
-                    }
-                  },
+    return LoaderOverlay(
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Padding(
+          padding: EdgeInsets.all(5),
+          child: Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Container(height: 20),
+                headerRow(
+                    urlPhoto: agent.photoProfil,
+                    prenom: agent.prenom,
+                    nom: agent.nom),
+                Container(height: 20),
+                infosRow(email: agent.email, telephone: agent.telephone),
+                likesAndSavesBar(),
+                Container(height: 5),
+                SizedBox(
+                  height: 1000,
+                  child: FutureBuilder<List>(
+                      future: getPicturesFromStorage(),
+                      builder:
+                          (BuildContext context, AsyncSnapshot<List> snapshot) {
+                        if (snapshot.hasData) {
+                          context.loaderOverlay.hide();
+                          return GridView.count(
+                            primary: false,
+                            crossAxisSpacing: 3,
+                            mainAxisSpacing: 3,
+                            crossAxisCount: 3,
+                            children: snapshot.data!
+                                .map((url) => InkWell(
+                                      onTap: () {
+                                        onTapOnePhoto(url);
+                                      },
+                                      child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          child: SizedBox.fromSize(
+                                            size: const Size.fromRadius(28),
+                                            child: Hero(
+                                              tag: url,
+                                              child: Image.network(
+                                                url.toString(),
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          )),
+                                    ))
+                                .toList(),
+                          );
+                        } else {
+                          context.loaderOverlay.show();
+                        }
+                        return const Text('');
+                      }),
                 ),
-              ),
-            ]),
+              ]),
+        ),
       ),
     );
+  }
+
+  onTapOnePhoto(url) {
+    print("salut coco");
+    print(url);
+    Navigator.push(context, MaterialPageRoute(builder: ((context) {
+      return PicturePage(
+              pathToImageFromProfil: url,
+              nomberOfLikes: 0,
+              index: 0,
+              publishDate: "Il y a 2h")
+          .displayPost(
+              pathToImage: url,
+              nomberOfLikes: 0,
+              index: 0,
+              publishDate: "Il y a 2h");
+    })));
   }
 
   Future<List> getPicturesFromStorage() async {
@@ -71,9 +116,30 @@ class _AgentProfilState extends State<AgentProfil> {
       final url = await ref.getDownloadURL();
       urlList.add(url.toString());
     }
-    print(urlList);
-
     return urlList;
+  }
+
+  Widget likesAndSavesBar() {
+    return Padding(
+      padding: EdgeInsets.all(1),
+      child: Column(
+        children: [
+          const Divider(
+            thickness: 0.5,
+            color: Colors.grey,
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Icon(Icons.favorite_border, size: 30),
+              Icon(Icons.file_download_done, size: 30),
+            ],
+          ),
+          const Divider(thickness: 0.5, color: Colors.grey)
+        ],
+      ),
+    );
   }
 
   Column infosRow({required String email, required int telephone}) {
@@ -101,7 +167,6 @@ class _AgentProfilState extends State<AgentProfil> {
   Container headerRow(
       {required String urlPhoto, required String prenom, required String nom}) {
     return Container(
-        color: Colors.white,
         width: MediaQuery.of(context).size.width,
         child: Row(
           mainAxisSize: MainAxisSize.max,
@@ -200,17 +265,15 @@ class _AgentProfilState extends State<AgentProfil> {
 //   );
 // }
 
-
-
-  // Widget allHeader(
-  //     {required String email,
-  //     required int telephone,
-  //     required String urlPhoto,
-  //     required String prenom,
-  //     required String nom}) {
-  //   return Column(children: [
-  //     headerRow(
-  //         urlPhoto: agent.photoProfil, prenom: agent.prenom, nom: agent.nom),
-  //     infosRow(email: agent.email, telephone: agent.telephone)
-  //   ]);
-  // }
+// Widget allHeader(
+//     {required String email,
+//     required int telephone,
+//     required String urlPhoto,
+//     required String prenom,
+//     required String nom}) {
+//   return Column(children: [
+//     headerRow(
+//         urlPhoto: agent.photoProfil, prenom: agent.prenom, nom: agent.nom),
+//     infosRow(email: agent.email, telephone: agent.telephone)
+//   ]);
+// }
