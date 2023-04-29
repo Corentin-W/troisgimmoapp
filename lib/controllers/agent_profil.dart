@@ -5,6 +5,7 @@ import 'package:troisgimmoapp/controllers/picture_page.dart';
 import 'package:troisgimmoapp/models/agent.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loader_overlay/loader_overlay.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class AgentProfil extends StatefulWidget {
   const AgentProfil({super.key});
@@ -24,6 +25,8 @@ class _AgentProfilState extends State<AgentProfil> {
   // Controller _controllerFeed;
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
     return LoaderOverlay(
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
@@ -58,7 +61,7 @@ class _AgentProfilState extends State<AgentProfil> {
                             children: snapshot.data!
                                 .map((url) => InkWell(
                                       onTap: () {
-                                        onTapOnePhoto(url);
+                                        onTapOnePhoto(url, screenWidth, screenHeight);
                                       },
                                       child: ClipRRect(
                                           borderRadius:
@@ -67,10 +70,9 @@ class _AgentProfilState extends State<AgentProfil> {
                                             size: const Size.fromRadius(28),
                                             child: Hero(
                                               tag: url,
-                                              child: Image.network(
-                                                url.toString(),
-                                                fit: BoxFit.cover,
-                                              ),
+                                              child: CachedNetworkImage(
+                                                  fit: BoxFit.cover,
+                                                  imageUrl: url.toString()),
                                             ),
                                           )),
                                     ))
@@ -88,7 +90,7 @@ class _AgentProfilState extends State<AgentProfil> {
     );
   }
 
-  onTapOnePhoto(url) {
+  onTapOnePhoto(url, screenWidth, screenHeight) {
     print("salut coco");
     print(url);
     Navigator.push(context, MaterialPageRoute(builder: ((context) {
@@ -101,7 +103,9 @@ class _AgentProfilState extends State<AgentProfil> {
               pathToImage: url,
               nomberOfLikes: 0,
               index: 0,
-              publishDate: "Il y a 2h");
+              publishDate: "Il y a 2h",
+              screenWidth: screenWidth,
+              screenHeight: screenHeight);
     })));
   }
 

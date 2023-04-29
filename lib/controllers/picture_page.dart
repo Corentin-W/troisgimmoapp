@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:rive/rive.dart';
 
 class PicturePage {
   String pathToImageFromProfil;
@@ -18,43 +20,34 @@ class PicturePage {
       {required String pathToImage,
       required int nomberOfLikes,
       required int index,
-      required String publishDate}) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(6),
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              header(publishDate: publishDate),
-              post(pathToImage: pathToImage),
-              likes(nbrLikes: nomberOfLikes),
-            ]),
+      required String publishDate,
+      required double screenHeight,
+      required double screenWidth}) {
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 1,
+        shadowColor: Colors.black,
+        backgroundColor: Color.fromARGB(0, 32, 12, 12),
       ),
-    );
-  }
-
-  Widget post({required String pathToImage}) {
-    return Hero(
-      tag: pathToImage,
-      child: Image.network(pathToImage, width: 450, height: 300),
-    );
-  }
-
-  Widget likes({required int nbrLikes}) {
-    return Row(
-      children: [
-        const Padding(
-          padding: EdgeInsets.only(left: 5),
-          child: Icon(
-            Icons.favorite,
-            size: 30,
+      body: SizedBox(
+        height: screenHeight / 1.5,
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(6),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  header(publishDate: publishDate),
+                  post(
+                      pathToImage: pathToImage,
+                      screenHeight: screenHeight,
+                      screenWidth: screenWidth),
+                  likes(nbrLikes: nomberOfLikes),
+                ]),
           ),
         ),
-        Text(nbrLikes.toString(),
-            style:
-                GoogleFonts.poppins(textStyle: const TextStyle(fontSize: 25)))
-      ],
+      ),
     );
   }
 
@@ -66,6 +59,38 @@ class PicturePage {
           publishDate,
           style: GoogleFonts.poppins(textStyle: const TextStyle(fontSize: 25)),
         )
+      ],
+    );
+  }
+
+  Widget post(
+      {required String pathToImage,
+      required double screenHeight,
+      required double screenWidth}) {
+    return Container(
+      decoration: BoxDecoration(
+          color: Color.fromARGB(147, 233, 221, 221),
+          borderRadius: BorderRadius.all(Radius.circular(5))),
+      height: screenHeight / 1.8,
+      width: screenWidth / 1.1,
+      child: Hero(
+        tag: pathToImage,
+        child: CachedNetworkImage(
+            fit: BoxFit.contain, imageUrl: pathToImage.toString()),
+      ),
+    );
+  }
+
+  Widget likes({required int nbrLikes}) {
+    return Row(
+      children: [
+        Icon(
+          Icons.favorite,
+          size: 30,
+        ),
+        Text(nbrLikes.toString(),
+            style:
+                GoogleFonts.poppins(textStyle: const TextStyle(fontSize: 25)))
       ],
     );
   }

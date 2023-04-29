@@ -31,6 +31,7 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
         shadowColor: Colors.black,
         backgroundColor: Color.fromARGB(0, 32, 12, 12),
         title: Container(
@@ -86,7 +87,6 @@ class _MainPageState extends State<MainPage> {
             ],
           ),
         ),
-        elevation: 0,
       ),
       bottomNavigationBar: BottomNavigationBar(
         elevation: 7,
