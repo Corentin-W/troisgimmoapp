@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:rive/rive.dart';
 
 class Feed extends StatefulWidget {
   const Feed({super.key});
@@ -18,18 +17,26 @@ class _FeedState extends State<Feed> {
       child: Column(
         children: [
           displayPost(),
+          const Divider(),
           displayPost(),
+          const Divider(),
           displayPost(),
+          const Divider(),
           displayPost(),
+          const Divider(),
           displayPost(),
         ],
       ),
     ));
   }
 
+  getAllPostsForFeed() async{
+
+  }
+
   Widget displayPost() {
     return Padding(
-      padding: EdgeInsets.all(2),
+      padding: const EdgeInsets.all(2),
       child: SizedBox(
         height: 400,
         child: Column(
@@ -59,43 +66,53 @@ class _FeedState extends State<Feed> {
             child: Text(
               "Corentin Waucampt",
               style: GoogleFonts.poppins(
-                  textStyle:
-                      TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                  textStyle: const TextStyle(
+                      fontSize: 15, fontWeight: FontWeight.bold)),
             ),
           ),
-          Spacer(),
-          Icon(Icons.menu_open),
+          const Spacer(),
+          const Icon(Icons.menu_open),
         ],
       ),
     );
   }
 
   imagePost() {
-    return Image.network(
-        'https://imageio.forbes.com/specials-images/dam/imageserve/1171238184/0x0.jpg?format=jpg&width=1200');
+    return Container(
+      decoration:
+          const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(20))),
+      child: Image.network(
+          'https://imageio.forbes.com/specials-images/dam/imageserve/1171238184/0x0.jpg?format=jpg&width=1200'),
+    );
   }
 
   socialsPost() {
     return Padding(
-      padding: EdgeInsets.all(5),
+      padding: const EdgeInsets.all(5),
       child: Column(children: [
+        Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('"Journée prospection ! Belle journée à tous."',
+                style: GoogleFonts.poppins(
+                    textStyle: const TextStyle(fontStyle: FontStyle.italic)))
+          ],
+        ),
         Row(children: [
-          Icon(
+          const Icon(
             Icons.favorite_border,
           ),
-          Icon(
-            Icons.mode_comment,
+          Text(
+            "4 likes",
+            style: GoogleFonts.poppins(
+                textStyle: const TextStyle(fontWeight: FontWeight.bold)),
           ),
-        ]),
-        Row(
-          children: [
-            Text(
-              "4 likes",
+          const Spacer(),
+          Text('Il y a 12min',
               style: GoogleFonts.poppins(
-                  textStyle: TextStyle(fontWeight: FontWeight.bold)),
-            )
-          ],
-        )
+                  textStyle: const TextStyle(fontWeight: FontWeight.bold)))
+        ]),
       ]),
     );
   }

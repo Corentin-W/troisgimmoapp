@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:troisgimmoapp/controllers/splash.dart';
-import 'package:troisgimmoapp/controllers/welcome.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'controllers/splash.dart';
+import 'controllers/welcome.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

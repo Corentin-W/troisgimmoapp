@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'picture_page.dart';
+
+import '../picture_page.dart';
+
 
 class AgentProfil extends StatefulWidget {
   const AgentProfil({super.key});

@@ -1,11 +1,12 @@
 import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:troisgimmoapp/controllers/agent_profil.dart';
-import 'package:troisgimmoapp/controllers/annonces.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:troisgimmoapp/controllers/feed.dart';
+
+import 'agent_profil.dart';
+import 'annonces.dart';
+import 'feed.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});

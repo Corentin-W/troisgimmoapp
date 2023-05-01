@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:troisgimmoapp/controllers/login_page.dart';
-import 'package:troisgimmoapp/controllers/main_page.dart';
+
+import 'login_page.dart';
+import 'main_page.dart';
 
 class Welcome extends StatelessWidget {
   const Welcome({super.key});

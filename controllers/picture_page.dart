@@ -72,11 +72,8 @@ class PicturePage {
       width: screenWidth,
       child: Hero(
         tag: pathToImage,
-        child: PhotoView(
-          backgroundDecoration:
-              const BoxDecoration(color: Color.fromARGB(255, 233, 221, 221)),
-          imageProvider: CachedNetworkImageProvider(pathToImage.toString()),
-        ),
+        child: CachedNetworkImage(
+            fit: BoxFit.contain, imageUrl: pathToImage.toString()),
       ),
     );
   }
