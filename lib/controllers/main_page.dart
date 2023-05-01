@@ -5,6 +5,7 @@ import 'package:troisgimmoapp/controllers/agent_profil.dart';
 import 'package:troisgimmoapp/controllers/annonces.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:troisgimmoapp/controllers/feed.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -20,10 +21,7 @@ class _MainPageState extends State<MainPage> {
 
   static const List _pages = [
     Annonces(),
-    Icon(
-      Icons.camera,
-      size: 150,
-    ),
+    Feed(),
     AgentProfil(),
   ];
 
@@ -33,7 +31,7 @@ class _MainPageState extends State<MainPage> {
       appBar: AppBar(
         elevation: 0,
         shadowColor: Colors.black,
-        backgroundColor: Color.fromARGB(0, 32, 12, 12),
+        backgroundColor: const Color.fromARGB(0, 32, 12, 12),
         title: Container(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -44,43 +42,19 @@ class _MainPageState extends State<MainPage> {
                   height: 100),
               IconButton(
                   onPressed: () async {
-                    // Get the current user id
-                    final FirebaseAuth auth = FirebaseAuth.instance;
-                    final User? user = auth.currentUser;
-                    final String userID = user!.uid;
-
-                    /** PICK IMAGE FROM GALLERY */
-                    ImagePicker imagePicker = ImagePicker();
-                    XFile? file = await imagePicker.pickImage(
-                        source: ImageSource.gallery);
-                    if (file == null) return;
-
-                    // Random name for database
-                    String uniqueFileName =
-                        DateTime.now().microsecondsSinceEpoch.toString();
-                    /** UPLOAD TO FIREBASE */
-                    // Get a reference to storage
-                    Reference referenceRoot =
-                        FirebaseStorage.instance.ref('feed/$userID/');
-                    Reference referenceDirImages =
-                        referenceRoot.child('images');
-                    // Create a reference for the image to be stored
-                    Reference referenceImageToUpload =
-                        referenceDirImages.child(uniqueFileName);
-
-                    // Handle errors success
-                    try {
-                      //Store the file
-                      await referenceImageToUpload.putFile(File(file.path));
-
-                      //Success get the download url
-                      imageUrl = await referenceImageToUpload.getDownloadURL();
-                    } catch (e) {
-                      print(e);
-                    }
+                    pickImage();
                   },
                   icon: const Icon(
                     Icons.add_a_photo_outlined,
+                    color: Colors.black,
+                    size: 35,
+                  )),
+              IconButton(
+                  onPressed: () async {
+                    logOut();
+                  },
+                  icon: const Icon(
+                    Icons.logout,
                     color: Colors.black,
                     size: 35,
                   )),
@@ -120,5 +94,46 @@ class _MainPageState extends State<MainPage> {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  pickImage() async {
+    // Get the current user id
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final User? user = auth.currentUser;
+    final String userID = user!.uid;
+
+    /** PICK IMAGE FROM GALLERY */
+    ImagePicker imagePicker = ImagePicker();
+    XFile? file = await imagePicker.pickImage(source: ImageSource.gallery);
+    if (file == null) return;
+
+    // Random name for database
+    String uniqueFileName = DateTime.now().microsecondsSinceEpoch.toString();
+    /** UPLOAD TO FIREBASE */
+    // Get a reference to storage
+    Reference referenceRoot = FirebaseStorage.instance.ref('feed/$userID/');
+    Reference referenceDirImages = referenceRoot.child('images');
+    // Create a reference for the image to be stored
+    Reference referenceImageToUpload = referenceDirImages.child(uniqueFileName);
+
+    // Handle errors success
+    try {
+      //Store the file
+      await referenceImageToUpload.putFile(File(file.path));
+
+      //Success get the download url
+      imageUrl = await referenceImageToUpload.getDownloadURL();
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  logOut() async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    try {
+      await auth.signOut();
+    } catch (e) {
+      return null;
+    }
   }
 }

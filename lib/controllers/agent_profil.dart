@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -15,74 +16,31 @@ class AgentProfil extends StatefulWidget {
 }
 
 class _AgentProfilState extends State<AgentProfil> {
-  Agent agent = Agent(
-      prenom: 'Patrick',
-      nom: 'Patulacci',
-      email: 'ppatulacci@3gimmobilier.com',
-      telephone: 0612345678,
-      secteur: 'Corse',
-      photoProfil: 'https://pbs.twimg.com/media/FjU2lkcWYAgNG6d.jpg');
-  // Controller _controllerFeed;
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+    final db = FirebaseFirestore.instance;
     return LoaderOverlay(
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Padding(
-          padding: EdgeInsets.all(5),
+          padding: const EdgeInsets.all(5),
           child: Column(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Container(height: 20),
-                headerRow(
-                    urlPhoto: agent.photoProfil,
-                    prenom: agent.prenom,
-                    nom: agent.nom),
-                Container(height: 20),
-                infosRow(email: agent.email, telephone: agent.telephone),
+                headerRow(),
+                // Container(height: 20),
+                // infosRow(email: agent.email),
+                // getConnectedUserInfos(),
                 likesAndSavesBar(),
                 Container(height: 5),
                 SizedBox(
                   height: 1000,
-                  child: FutureBuilder<List>(
-                      future: getPicturesFromStorage(),
-                      builder:
-                          (BuildContext context, AsyncSnapshot<List> snapshot) {
-                        if (snapshot.hasData) {
-                          context.loaderOverlay.hide();
-                          return GridView.count(
-                            primary: false,
-                            crossAxisSpacing: 3,
-                            mainAxisSpacing: 3,
-                            crossAxisCount: 3,
-                            children: snapshot.data!
-                                .map((url) => InkWell(
-                                      onTap: () {
-                                        onTapOnePhoto(url, screenWidth, screenHeight);
-                                      },
-                                      child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                          child: SizedBox.fromSize(
-                                            size: const Size.fromRadius(28),
-                                            child: Hero(
-                                              tag: url,
-                                              child: CachedNetworkImage(
-                                                  fit: BoxFit.cover,
-                                                  imageUrl: url.toString()),
-                                            ),
-                                          )),
-                                    ))
-                                .toList(),
-                          );
-                        } else {
-                          context.loaderOverlay.show();
-                        }
-                        return const Text('');
-                      }),
+                  child: futurebuilderPourGridPhotos(
+                      screenWidth: screenWidth, screenHeight: screenHeight),
                 ),
               ]),
         ),
@@ -90,9 +48,77 @@ class _AgentProfilState extends State<AgentProfil> {
     );
   }
 
+  // Future<String> getConnectedUserInfos() async {
+  //   Agent? instanceAgent;
+  //   var email = "NONN";
+  //   final FirebaseAuth auth = FirebaseAuth.instance;
+  //   final User? user = auth.currentUser;
+  //   final String userID = user!.uid;
+  //   var result = await FirebaseFirestore.instance
+  //       .collection('Users')
+  //       .where('id', isEqualTo: userID)
+  //       .get();
+  //   var prenom = result.docs.first.data()['prenom'];
+  //   var nom = result.docs.first.data()['nom'];
+  //   var urlPhoto = result.docs.first.data()['urlPhoto'];
+  //   email = result.docs.first.data()['email'];
+  //   print(email);
+  //   return email;
+  //   // instanceAgent =
+  //   //     Agent(prenom: prenom, nom: nom, email: email, photoProfil: urlPhoto);
+
+  //   // return instanceAgent;
+  // }
+
+  Future<dynamic> queryForAgentInfos() async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final User? user = auth.currentUser;
+    final String userID = user!.uid;
+    var result = await FirebaseFirestore.instance
+        .collection('Users')
+        .where('id', isEqualTo: userID)
+        .get();
+    return result;
+  }
+
+  futurebuilderPourGridPhotos({required screenWidth, required screenHeight}) {
+    return FutureBuilder<List>(
+        future: getPicturesFromStorage(),
+        builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+          if (snapshot.hasData) {
+            context.loaderOverlay.hide();
+            return GridView.count(
+              primary: false,
+              crossAxisSpacing: 3,
+              mainAxisSpacing: 3,
+              crossAxisCount: 3,
+              children: snapshot.data!
+                  .map((url) => InkWell(
+                        onTap: () {
+                          onTapOnePhoto(url, screenWidth, screenHeight);
+                        },
+                        child: ClipRRect(
+                            borderRadius: BorderRadius.circular(5),
+                            child: SizedBox.fromSize(
+                              size: const Size.fromRadius(28),
+                              child: Hero(
+                                tag: url,
+                                child: CachedNetworkImage(
+                                    fit: BoxFit.cover,
+                                    imageUrl: url.toString()),
+                              ),
+                            )),
+                      ))
+                  .toList(),
+            );
+          } else {
+            context.loaderOverlay.show();
+          }
+          return const Text('');
+        });
+  }
+
   onTapOnePhoto(url, screenWidth, screenHeight) {
-    print("salut coco");
-    print(url);
     Navigator.push(context, MaterialPageRoute(builder: ((context) {
       return PicturePage(
               pathToImageFromProfil: url,
@@ -125,7 +151,7 @@ class _AgentProfilState extends State<AgentProfil> {
 
   Widget likesAndSavesBar() {
     return Padding(
-      padding: EdgeInsets.all(1),
+      padding: const EdgeInsets.all(1),
       child: Column(
         children: [
           const Divider(
@@ -135,7 +161,7 @@ class _AgentProfilState extends State<AgentProfil> {
           Row(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
+            children: const [
               Icon(Icons.favorite_border, size: 30),
               Icon(Icons.file_download_done, size: 30),
             ],
@@ -146,14 +172,11 @@ class _AgentProfilState extends State<AgentProfil> {
     );
   }
 
-  Column infosRow({required String email, required int telephone}) {
+  Column infosRow({required String email}) {
     return Column(
       children: [
-        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          const Icon(Icons.phone),
-          Text(telephone.toString(),
-              style: GoogleFonts.poppins(
-                  textStyle: const TextStyle(color: Colors.grey)))
+        Row(mainAxisAlignment: MainAxisAlignment.center, children: const [
+          Icon(Icons.phone),
         ]),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -168,40 +191,54 @@ class _AgentProfilState extends State<AgentProfil> {
     );
   }
 
-  Container headerRow(
-      {required String urlPhoto, required String prenom, required String nom}) {
-    return Container(
-        width: MediaQuery.of(context).size.width,
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            CircleAvatar(
-              backgroundImage: NetworkImage(urlPhoto),
-              radius: 60,
-            ),
-            Column(
+  Widget headerRow() {
+    final db = FirebaseFirestore.instance;
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final User? user = auth.currentUser;
+    final String userID = user!.uid;
+    return StreamBuilder(
+      stream: db.collection('Users').where('id', isEqualTo: userID).snapshots(),
+      builder: (context, snpashot) {
+        String urlPhoto = snpashot.data?.docs.single.data()["urlPhoto"] ??
+            "https://www.3gimmobilier.com/Ressource/Logo/LOGO3G-2022-classique-header.png";
+
+        String prenom = snpashot.data?.docs.single.data()["prenom"] ?? "3G";
+
+        String nom = snpashot.data?.docs.single.data()["nom"] ?? "IMMO";
+        return SizedBox(
+            width: MediaQuery.of(context).size.width,
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Text(
-                  prenom,
-                  style: GoogleFonts.poppins(
-                      textStyle: const TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.w800,
-                          fontStyle: FontStyle.italic)),
+                CircleAvatar(
+                  backgroundImage: NetworkImage(urlPhoto),
+                  radius: 60,
                 ),
-                Text(
-                  nom,
-                  style: GoogleFonts.poppins(
-                      textStyle: const TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.w800,
-                          fontStyle: FontStyle.italic)),
-                ),
+                Column(
+                  children: [
+                    Text(
+                      prenom,
+                      style: GoogleFonts.poppins(
+                          textStyle: const TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w800,
+                              fontStyle: FontStyle.italic)),
+                    ),
+                    Text(
+                      nom,
+                      style: GoogleFonts.poppins(
+                          textStyle: const TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w800,
+                              fontStyle: FontStyle.italic)),
+                    ),
+                  ],
+                )
               ],
-            )
-          ],
-        ));
+            ));
+      },
+    );
   }
 }
 

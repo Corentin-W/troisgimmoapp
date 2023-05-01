@@ -20,11 +20,11 @@ class _AnnoncesState extends State<Annonces> {
       stream: db,
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
-          return Text('Something went wrong');
+          return const Text('Something went wrong');
         }
 
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Text("Loading");
+          return const Text("Loading");
         }
 
         return ListView.builder(
@@ -60,27 +60,25 @@ class _AnnoncesState extends State<Annonces> {
   //           );
   //         }).toList(),
 
-  getAllAnnonces() async {
-    final db = FirebaseFirestore.instance;
-    List<dynamic>? listeDesAnnonces = [];
-    db.collection('Annonces').get().then(
-      (querySnapshot) {
-        print("Success");
-        for (var docSnapshot in querySnapshot.docs) {
-          Annonce annonce = Annonce(
-              prix: docSnapshot.get('prix'),
-              surface: double.parse(docSnapshot.get('surface').toString()),
-              honoraires:
-                  double.parse(docSnapshot.get('honoraires').toString()),
-              type: docSnapshot.get('type').toString(),
-              linkPhoto: docSnapshot.get('linkPhoto').toString(),
-              villeDiffusion: docSnapshot.get('villeDiffusion').toString());
-          print(annonce);
-          listeDesAnnonces.add(annonce);
-        }
-        return listeDesAnnonces;
-      },
-      onError: (e) => print('probleme mamen'),
-    );
-  }
+  // getAllAnnonces() async {
+  //   final db = FirebaseFirestore.instance;
+  //   List<dynamic>? listeDesAnnonces = [];
+  //   db.collection('Annonces').get().then(
+  //     (querySnapshot) {
+  //       for (var docSnapshot in querySnapshot.docs) {
+  //         Annonce annonce = Annonce(
+  //             prix: docSnapshot.get('prix'),
+  //             surface: double.parse(docSnapshot.get('surface').toString()),
+  //             honoraires:
+  //                 double.parse(docSnapshot.get('honoraires').toString()),
+  //             type: docSnapshot.get('type').toString(),
+  //             linkPhoto: docSnapshot.get('linkPhoto').toString(),
+  //             villeDiffusion: docSnapshot.get('villeDiffusion').toString());
+  //         listeDesAnnonces.add(annonce);
+  //       }
+  //       return listeDesAnnonces;
+  //     },
+  //     onError: (e) => print('probleme mamen'),
+  //   );
+  // }
 }

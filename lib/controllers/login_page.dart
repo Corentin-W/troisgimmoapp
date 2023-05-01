@@ -81,7 +81,6 @@ class _LoginPageState extends State<LoginPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 25),
                 child: GestureDetector(
                   onTap: () {
-                    print(_passwordController);
                     signIn();
                   },
                   child: Container(

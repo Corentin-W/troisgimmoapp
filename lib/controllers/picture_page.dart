@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:rive/rive.dart';
 
 class PicturePage {
   String pathToImageFromProfil;
@@ -27,24 +26,31 @@ class PicturePage {
       appBar: AppBar(
         elevation: 1,
         shadowColor: Colors.black,
-        backgroundColor: Color.fromARGB(0, 32, 12, 12),
+        backgroundColor: const Color.fromARGB(0, 32, 12, 12),
       ),
-      body: SizedBox(
-        height: screenHeight / 1.5,
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(6),
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  header(publishDate: publishDate),
-                  post(
-                      pathToImage: pathToImage,
-                      screenHeight: screenHeight,
-                      screenWidth: screenWidth),
-                  likes(nbrLikes: nomberOfLikes),
-                ]),
+      body: SingleChildScrollView(
+        child: SizedBox(
+          height: screenHeight,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(5),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    header(publishDate: publishDate),
+                    Container(height: 5),
+                    Material(
+                      elevation: 15,
+                      child: post(
+                          pathToImage: pathToImage,
+                          screenHeight: screenHeight,
+                          screenWidth: screenWidth),
+                    ),
+                    Container(height: 20),
+                    likes(nbrLikes: nomberOfLikes),
+                  ]),
+            ),
           ),
         ),
       ),
@@ -57,7 +63,7 @@ class PicturePage {
         const Spacer(),
         Text(
           publishDate,
-          style: GoogleFonts.poppins(textStyle: const TextStyle(fontSize: 25)),
+          style: GoogleFonts.poppins(textStyle: const TextStyle(fontSize: 20)),
         )
       ],
     );
@@ -68,11 +74,11 @@ class PicturePage {
       required double screenHeight,
       required double screenWidth}) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
           color: Color.fromARGB(147, 233, 221, 221),
           borderRadius: BorderRadius.all(Radius.circular(5))),
-      height: screenHeight / 1.8,
-      width: screenWidth / 1.1,
+      height: screenHeight / 2,
+      width: screenWidth,
       child: Hero(
         tag: pathToImage,
         child: CachedNetworkImage(
@@ -84,7 +90,7 @@ class PicturePage {
   Widget likes({required int nbrLikes}) {
     return Row(
       children: [
-        Icon(
+        const Icon(
           Icons.favorite,
           size: 30,
         ),

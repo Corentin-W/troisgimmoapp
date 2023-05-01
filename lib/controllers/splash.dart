@@ -1,7 +1,9 @@
 import 'package:animated_splash_screen/animated_splash_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:troisgimmoapp/controllers/welcome.dart';
-import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class Splash extends StatefulWidget {
   const Splash({super.key});
@@ -12,8 +14,9 @@ class Splash extends StatefulWidget {
 
 class _SplashState extends State<Splash> {
   @override
-  void initState() {
+  initState() {
     super.initState();
+    getPicturesFromStorage();
     // _navigateToWelcome();
   }
 
@@ -38,5 +41,23 @@ class _SplashState extends State<Splash> {
         ),
       ),
     );
+  }
+
+  Future<List> getPicturesFromStorage() async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final User? user = auth.currentUser;
+    final String userID = user?.uid ?? "0";
+    List urlList = [];
+    final ListResult result =
+        await FirebaseStorage.instance.ref('feed/$userID/images/').listAll();
+    for (final ref in result.items) {
+      final url = await ref.getDownloadURL();
+      CachedNetworkImage(
+        imageUrl: url,
+      );
+      urlList.add(url.toString());
+    }
+
+    return urlList;
   }
 }
