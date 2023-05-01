@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class Feed extends StatefulWidget {
   const Feed({super.key});
@@ -9,6 +11,14 @@ class Feed extends StatefulWidget {
 }
 
 class _FeedState extends State<Feed> {
+  List<firebase_storage.Reference> imageList = <firebase_storage.Reference>[];
+
+  @override
+  void initState() {
+    super.initState();
+    getAllPostsForFeed();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,13 +26,7 @@ class _FeedState extends State<Feed> {
       scrollDirection: Axis.vertical,
       child: Column(
         children: [
-          displayPost(),
-          const Divider(),
-          displayPost(),
-          const Divider(),
-          displayPost(),
-          const Divider(),
-          displayPost(),
+          gridview(),
           const Divider(),
           displayPost(),
         ],
@@ -30,8 +34,23 @@ class _FeedState extends State<Feed> {
     ));
   }
 
-  getAllPostsForFeed() async{
+  Future<void> getAllPostsForFeed() async {
+    var result = (await firebase_storage.FirebaseStorage.instance
+        .ref('feed/')
+        .listAll());
+    for (var element in result.prefixes) {
+      
+      print("element");
+      print(element);
+    }
+    setState(() {
+      imageList = result.items;
+    });
+  }
 
+  Widget gridview() {
+    print(imageList);
+    return Text("cocolabricot");
   }
 
   Widget displayPost() {
@@ -79,8 +98,8 @@ class _FeedState extends State<Feed> {
 
   imagePost() {
     return Container(
-      decoration:
-          const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(20))),
+      decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(20))),
       child: Image.network(
           'https://imageio.forbes.com/specials-images/dam/imageserve/1171238184/0x0.jpg?format=jpg&width=1200'),
     );
