@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:cached_network_image/cached_network_image.dart';
 
 class Feed extends StatefulWidget {
   const Feed({super.key});
@@ -127,7 +128,7 @@ class _FeedState extends State<Feed> {
     return Container(
       decoration: const BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(20))),
-      child: Image.network(urlPicture),
+      child: CachedNetworkImage(imageUrl: urlPicture),
     );
   }
 
