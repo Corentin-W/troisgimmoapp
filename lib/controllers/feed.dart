@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -11,41 +12,61 @@ class Feed extends StatefulWidget {
 }
 
 class _FeedState extends State<Feed> {
-  List<firebase_storage.Reference> imageList = <firebase_storage.Reference>[];
+  List? imageList;
 
-  @override
-  void initState() {
-    super.initState();
-    getAllPostsForFeed();
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   getAllPostsForFeed();
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: SingleChildScrollView(
       scrollDirection: Axis.vertical,
-      child: Column(
-        children: [
-          gridview(),
-          const Divider(),
-          displayPost(),
-        ],
-      ),
+      child: FutureBuilder(
+          future: getAllPostsForFeed(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              List? urls = snapshot.data;
+              return ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: urls?.length,
+                  itemBuilder: (context, index) {
+                    return Column(
+                      children: [
+                        displayPost(
+                            urlPicture: urls![index],
+                            urlProfilPicture:
+                                'https://cdn.pixabay.com/photo/2023/01/28/19/22/ai-generated-7751582_960_720.jpg',
+                            nbLikes: 12,
+                            title:
+                                "Brainstorming avec les collègues de la région, bon apéro à tous !!"),
+                        // Image.network(urls![index]),
+                        const Divider(),
+                      ],
+                    );
+                  });
+            } else if (snapshot.hasError) {
+              return Text(snapshot.error.toString());
+            } else {
+              return const Center(child: CircularProgressIndicator());
+            }
+          }),
     ));
   }
 
-  Future<void> getAllPostsForFeed() async {
-    var result = (await firebase_storage.FirebaseStorage.instance
-        .ref('feed/')
-        .listAll());
-    for (var element in result.prefixes) {
-      
-      print("element");
-      print(element);
+  Future<List> getAllPostsForFeed() async {
+    List urls = [];
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('Feed url')
+        .orderBy('date', descending: true)
+        .get();
+    for (var element in querySnapshot.docs) {
+      urls.add(element['url']);
     }
-    setState(() {
-      imageList = result.items;
-    });
+    return urls;
   }
 
   Widget gridview() {
@@ -53,7 +74,11 @@ class _FeedState extends State<Feed> {
     return Text("cocolabricot");
   }
 
-  Widget displayPost() {
+  Widget displayPost(
+      {required String urlPicture,
+      required String urlProfilPicture,
+      required String title,
+      required int nbLikes}) {
     return Padding(
       padding: const EdgeInsets.all(2),
       child: SizedBox(
@@ -61,23 +86,26 @@ class _FeedState extends State<Feed> {
         child: Column(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.start,
-          children: [rowPost(), imagePost(), socialsPost()],
+          children: [
+            rowPost(urlProfilPicture: urlProfilPicture),
+            imagePost(urlPicture: urlPicture),
+            socialsPost(title: title, likes: nbLikes)
+          ],
         ),
       ),
     );
   }
 
-  rowPost() {
+  rowPost({required String urlProfilPicture}) {
     return Padding(
       padding: const EdgeInsets.all(5),
       child: Row(
         children: [
-          const CircleAvatar(
+          CircleAvatar(
               radius: 23,
-              backgroundColor: Color(0xff87d300),
+              backgroundColor: const Color(0xff87d300),
               child: CircleAvatar(
-                backgroundImage: NetworkImage(
-                    "https://avatarfiles.alphacoders.com/223/223913.jpg"),
+                backgroundImage: NetworkImage(urlProfilPicture),
                 radius: 20,
               )),
           Padding(
@@ -96,16 +124,15 @@ class _FeedState extends State<Feed> {
     );
   }
 
-  imagePost() {
+  imagePost({required String urlPicture}) {
     return Container(
       decoration: const BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(20))),
-      child: Image.network(
-          'https://imageio.forbes.com/specials-images/dam/imageserve/1171238184/0x0.jpg?format=jpg&width=1200'),
+      child: Image.network(urlPicture),
     );
   }
 
-  socialsPost() {
+  socialsPost({required String title, required int likes}) {
     return Padding(
       padding: const EdgeInsets.all(5),
       child: Column(children: [
@@ -113,9 +140,12 @@ class _FeedState extends State<Feed> {
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('"Journée prospection ! Belle journée à tous."',
-                style: GoogleFonts.poppins(
-                    textStyle: const TextStyle(fontStyle: FontStyle.italic)))
+            Expanded(
+              child: Text(title,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                      textStyle: const TextStyle(fontStyle: FontStyle.italic))),
+            )
           ],
         ),
         Row(children: [
@@ -123,7 +153,7 @@ class _FeedState extends State<Feed> {
             Icons.favorite_border,
           ),
           Text(
-            "4 likes",
+            "$likes likes",
             style: GoogleFonts.poppins(
                 textStyle: const TextStyle(fontWeight: FontWeight.bold)),
           ),

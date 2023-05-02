@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -124,6 +125,13 @@ class _MainPageState extends State<MainPage> {
 
       //Success get the download url
       imageUrl = await referenceImageToUpload.getDownloadURL();
+
+      int dateNow = DateTime.now().millisecondsSinceEpoch;
+
+      // Store the url and the timestamp in the db firebase
+      FirebaseFirestore.instance
+          .collection('Feed url')
+          .add({'url': imageUrl, 'date': dateNow});
     } catch (e) {
       print(e);
     }
