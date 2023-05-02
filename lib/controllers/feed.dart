@@ -23,15 +23,14 @@ class _FeedState extends State<Feed> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SingleChildScrollView(
-      scrollDirection: Axis.vertical,
-      child: FutureBuilder(
+      body: FutureBuilder(
           future: getAllPostsForFeed(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               List? urls = snapshot.data;
               return ListView.builder(
                   shrinkWrap: true,
+                  physics: AlwaysScrollableScrollPhysics(),
                   itemCount: urls?.length,
                   itemBuilder: (context, index) {
                     return Column(
@@ -43,8 +42,9 @@ class _FeedState extends State<Feed> {
                             nbLikes: 12,
                             title:
                                 "Brainstorming avec les collègues de la région, bon apéro à tous !!"),
-                        // Image.network(urls![index]),
+                        Container(height: 10),
                         const Divider(),
+                        Container(height: 10),
                       ],
                     );
                   });
@@ -54,7 +54,7 @@ class _FeedState extends State<Feed> {
               return const Center(child: CircularProgressIndicator());
             }
           }),
-    ));
+    );
   }
 
   Future<List> getAllPostsForFeed() async {
@@ -81,8 +81,7 @@ class _FeedState extends State<Feed> {
       required int nbLikes}) {
     return Padding(
       padding: const EdgeInsets.all(2),
-      child: SizedBox(
-        height: 400,
+      child: Expanded(
         child: Column(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.start,
