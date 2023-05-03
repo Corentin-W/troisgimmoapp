@@ -82,8 +82,8 @@ class _AgentProfilState extends State<AgentProfil> {
   }
 
   futurebuilderPourGridPhotos({required screenWidth, required screenHeight}) {
-    return FutureBuilder<List>(
-        future: getPicturesFromStorage(),
+    return StreamBuilder<List>(
+        stream: getPicturesStream(),
         builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
           if (snapshot.hasData) {
             context.loaderOverlay.hide();
@@ -118,6 +118,24 @@ class _AgentProfilState extends State<AgentProfil> {
         });
   }
 
+  Stream<List> getPicturesStream() {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final User? user = auth.currentUser;
+    final String userID = user!.uid;
+    return FirebaseStorage.instance
+        .ref('feed/$userID/images/')
+        .listAll()
+        .asStream()
+        .asyncMap((result) async {
+      List urlList = [];
+      for (final ref in result.items) {
+        final url = await ref.getDownloadURL();
+        urlList.add(url.toString());
+      }
+      return urlList;
+    });
+  }
+
   onTapOnePhoto(url, screenWidth, screenHeight) {
     Navigator.push(context, MaterialPageRoute(builder: ((context) {
       return PicturePage(
@@ -133,20 +151,6 @@ class _AgentProfilState extends State<AgentProfil> {
               screenWidth: screenWidth,
               screenHeight: screenHeight);
     })));
-  }
-
-  Future<List> getPicturesFromStorage() async {
-    final FirebaseAuth auth = FirebaseAuth.instance;
-    final User? user = auth.currentUser;
-    final String userID = user!.uid;
-    List urlList = [];
-    final ListResult result =
-        await FirebaseStorage.instance.ref('feed/$userID/images/').listAll();
-    for (final ref in result.items) {
-      final url = await ref.getDownloadURL();
-      urlList.add(url.toString());
-    }
-    return urlList;
   }
 
   Widget likesAndSavesBar() {

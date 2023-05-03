@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:troisgimmoapp/controllers/image_edit.dart';
 
 import 'agent_profil.dart';
 import 'annonces.dart';
@@ -132,6 +133,10 @@ class _MainPageState extends State<MainPage> {
       FirebaseFirestore.instance
           .collection('Feed url')
           .add({'url': imageUrl, 'date': dateNow});
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => new ImageEdit(imageURL: imageUrl)));
     } catch (e) {
       print(e);
     }
