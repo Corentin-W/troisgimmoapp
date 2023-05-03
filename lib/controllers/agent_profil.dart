@@ -22,6 +22,7 @@ class _AgentProfilState extends State<AgentProfil> {
     final db = FirebaseFirestore.instance;
     return LoaderOverlay(
       child: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
         scrollDirection: Axis.vertical,
         child: Padding(
           padding: const EdgeInsets.all(5),

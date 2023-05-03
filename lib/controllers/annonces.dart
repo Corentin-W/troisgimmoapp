@@ -28,6 +28,7 @@ class _AnnoncesState extends State<Annonces> {
         }
 
         return ListView.builder(
+          physics: BouncingScrollPhysics(),
           itemCount: snapshot.data!.docs.length,
           itemBuilder: (context, index) {
             final doc = snapshot.data!.docs[index];

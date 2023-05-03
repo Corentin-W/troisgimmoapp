@@ -31,7 +31,7 @@ class _FeedState extends State<Feed> {
               List? urls = snapshot.data;
               return ListView.builder(
                   shrinkWrap: true,
-                  physics: AlwaysScrollableScrollPhysics(),
+                  physics: BouncingScrollPhysics(),
                   itemCount: urls?.length,
                   itemBuilder: (context, index) {
                     return Column(
